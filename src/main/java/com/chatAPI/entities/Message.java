@@ -23,8 +23,6 @@ public class Message {
 
     private String text;
 
-    private String sender;
-
     private LocalDateTime sentAt;
 
     @ManyToOne

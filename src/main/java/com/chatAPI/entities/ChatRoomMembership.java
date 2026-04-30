@@ -23,11 +23,11 @@ public class ChatRoomMembership {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User userId;
+    private User user;
 
     @ManyToOne
     @JoinColumn(name = "chatRoom_id")
-    private Chatroom chatRoomId;
+    private Chatroom chatroom;
 
     private LocalDateTime joinedAt;
 
