@@ -8,7 +8,6 @@ import lombok.Data;
 public class MessageRequestDto {
 
     private String message;
-    private Long userId;
     private Long chatroomId;
 
 }

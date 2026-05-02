@@ -9,7 +9,13 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class MessageResponseDto {
 
+    private Long id;
+    private String message;
+    private String senderName;
+    private Long chatroomId;
+    private String chatroomName;
     private LocalDateTime sentAt;
+
 
 
 }
