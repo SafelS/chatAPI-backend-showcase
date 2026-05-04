@@ -12,12 +12,17 @@ import com.chatAPI.repositories.ChatroomRepository;
 import com.chatAPI.repositories.MessageRepository;
 import com.chatAPI.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Array;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -30,7 +35,7 @@ public class MessageService {
     private final ChatroomRepository chatroomRepository;
     private final SimpMessagingTemplate messagingTemplate;
 
-    public MessageResponseDto createMessage(MessageRequestDto requestDto){
+    public MessageResponseDto createAndSendMessage(MessageRequestDto requestDto){
 
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
@@ -63,6 +68,22 @@ public class MessageService {
 
         return  messageResponseDto;
 
+
+    }
+
+    public Page<MessageResponseDto> getMessages(int page, int size, Long chatroomId){
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("sentAt").descending());
+
+        return messageRepository.findByChatroomId(chatroomId, pageable)
+                .map(m-> new MessageResponseDto(
+                        m.getId(),
+                        m.getText(),
+                        m.getUser().getUsername(),
+                        m.getChatroom().getId(),
+                        m.getChatroom().getName(),
+                        m.getSentAt()
+                ));
 
     }
 }
