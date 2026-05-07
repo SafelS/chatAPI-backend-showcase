@@ -47,7 +47,7 @@ public class ChatroomService {
 
 
     }
-    
+
     public ChatroomResponseDto createGroupChat(ChatroomRequestDto requestDto){
 
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
