@@ -11,10 +11,12 @@ import com.chatAPI.repositories.ChatroomMembershipRepository;
 import com.chatAPI.repositories.ChatroomRepository;
 import com.chatAPI.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.processing.CheckHQL;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -85,6 +87,56 @@ public class ChatroomService {
         }
 
     }
+
+    public ChatroomResponseDto joinGroupChat(String groupName){
+
+        Chatroom chatroom = chatroomRepository.findByName(groupName).orElseThrow(() -> new RuntimeException("Chat not found!"));
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found!"));
+
+        if (chatroomMembershipRepository.existsByUserAndChatroom(user, chatroom)){
+            throw new RuntimeException("User is already in group!");
+        }
+
+        ChatRoomMembership membership = new ChatRoomMembership();
+        membership.setUser(user);
+        membership.setChatroom(chatroom);
+        membership.setJoinedAt(LocalDateTime.now());
+        chatroomMembershipRepository.save(membership);
+
+        return new ChatroomResponseDto(chatroom.getId(),chatroom.getName(),chatroom.getType());
+
+
+    }
+
+    public void leaveGroupChat(String groupName){
+
+        Chatroom chatroom = chatroomRepository.findByName(groupName).orElseThrow(() -> new RuntimeException("Chat not found!"));
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found!"));
+
+        ChatRoomMembership membership = chatroomMembershipRepository.findByUserAndChatroom(user, chatroom)
+                .orElseThrow(() -> new RuntimeException("User is not in Group or Group no longer exists!"));
+
+        chatroomMembershipRepository.delete(membership);
+
+    }
+
+    public List<ChatroomResponseDto> getUserChats(){
+
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("USer not found"));
+
+        List<ChatRoomMembership> memberships = chatroomMembershipRepository.findByUser(user);
+
+        List<ChatroomResponseDto> chatrooms = memberships.stream()
+                .map(m -> new ChatroomResponseDto(m.getChatroom().getId(),m.getChatroom().getName(), m.getChatroom().getType())).toList();
+
+        return chatrooms;
+
+    }
+
+
 
 
 }

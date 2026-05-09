@@ -23,4 +23,6 @@ public interface ChatroomRepository extends JpaRepository<Chatroom, Long> {
             @Param("userBId") Long userBId,
             @Param("type") ChatType type
     );
+
+    Optional<Chatroom> findByName(String name);
 }
