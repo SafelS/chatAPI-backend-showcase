@@ -32,7 +32,7 @@ public class UserService {
         return users;
     }
 
-    public UserResponseDto searchUserByUsername(String username){
+    public UserResponseDto searchByUsername(String username){
 
         User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User does not exist!"));
 
